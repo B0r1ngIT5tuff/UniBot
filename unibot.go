@@ -36,11 +36,12 @@ func main() {
 			chatID := update.Message.Chat.ID
 
 			//Now it will send a message to the "chatID"
-			_, err := bot.SendMessage(tu.Message(tu.ID(chatID), "To be defined"))
+			_, err := bot.SendMessage(tu.Message(tu.ID(chatID), "Fetching..."))
 
 			if err != nil {
 				bot.SendMessage(tu.Message(tu.ID(chatID), "C'è stato un errore, termino il bot."))
 			}
+
 			// END IF
 		}
 		// LOOP END
