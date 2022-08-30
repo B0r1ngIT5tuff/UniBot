@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	sc "github.com/B0r3ngIt5tuff/voyageBot/scraper"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -13,6 +12,7 @@ import (
 func main() {
 
 	API_TOKEN, ferr := os.ReadFile("token.txt")
+	//vsc := sc.UserRequest{}
 
 	if ferr != nil {
 		fmt.Println(ferr)
@@ -64,7 +64,7 @@ func main() {
 
 	}, th.CommandEqual("help"))
 
-	// Will match any message with command '/voli'
+	// Will match  the command '/voli'
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 
 		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
@@ -73,8 +73,14 @@ func main() {
 				"Data ritorno (yyyy-mm-dd)"+"/"+
 				"Numero adulti"+"/"+
 				"Numero studenti"+"/"+
-				"Numero bambini",
-		))
+				"Numero bambini\n\n"+
+				"Inserisci le informazioni richieste.",
+		).WithReplyMarkup(tu.InlineKeyboard(
+			// Buttons below the message
+			tu.InlineKeyboardRow(tu.InlineKeyboardButton("Città ✈️").WithCallbackData("city"), tu.InlineKeyboardButton("Date 📅").WithCallbackData("dates")),
+			tu.InlineKeyboardRow(tu.InlineKeyboardButton("N° Passeggeri 👥").WithCallbackData("passengers")),
+		)),
+		)
 
 		if err != nil {
 			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
@@ -82,11 +88,28 @@ func main() {
 			os.Exit(1)
 		}
 
-		sc.ParseData(message)
-
 	}, th.CommandEqual("voli"))
 
-	// Will match any message with command '/b_and_b'
+	/* CallBack handler to InlineKeyboardButton city */
+
+	bh.HandleCallbackQuery(func(bot *telego.Bot, query telego.CallbackQuery) {
+		//
+		_, cerr := bot.SendMessage(tu.Message(tu.ID(query.Message.Chat.ID),
+			"",
+		))
+
+		bot.
+
+		if cerr != nil {
+			bot.SendMessage(tu.Message(tu.ID(query.Message.Chat.ID), "C'è stato un errore 😓"))
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}, th.AnyCallbackQueryWithMessage(), th.CallbackDataEqual("city"))
+
+	/*----------------------------------------------------------------------------------------*/
+
+	// Will match the command '/b_and_b'
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
 

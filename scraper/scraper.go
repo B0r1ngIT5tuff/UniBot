@@ -1,7 +1,9 @@
 package scraper
 
 import (
+	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/mymmrac/telego"
@@ -19,7 +21,7 @@ type UserRequest struct {
 	HoldL      uint
 }
 
-func GetPlaneOffers(userData UserRequest) {
+func (u *UserRequest) GetPlaneOffers(userData UserRequest) {
 
 	// Scraper created (Collector)
 	scraper := colly.NewCollector(colly.AllowedDomains(""))
@@ -37,7 +39,7 @@ func GetPlaneOffers(userData UserRequest) {
 	}
 }
 
-func GetB_and_B_Offers() {
+func (u *UserRequest) GetB_and_B_Offers() {
 
 	// Scraper created (Collector)
 	scraper := colly.NewCollector(colly.AllowedDomains(""))
@@ -53,7 +55,7 @@ func GetB_and_B_Offers() {
 	}
 }
 
-func ParseData(m telego.Message) {
+func (u *UserRequest) ParseData(m telego.Message) (string, error) {
 
 	// Parse message with regex
 	// Regex for cities: [A-Z]
@@ -63,4 +65,12 @@ func ParseData(m telego.Message) {
 	// Regex for adults: (\dchildren)
 	// Regex for handheld luggage: (cfc)
 	// Regex for hold luggage: (bfc)
+
+	validURL := regexp.MustCompile(`([A-Z]){3}|-|\d{4}|\d{2}`)
+
+	if validURL.MatchString(m.Text) {
+		return m.Text, nil
+	} else {
+		return "", errors.New("input: Doesn't satisfy the format")
+	}
 }
