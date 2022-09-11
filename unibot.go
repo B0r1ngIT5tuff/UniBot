@@ -67,20 +67,7 @@ func main() {
 	// Will match  the command '/voli'
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 
-		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
-			"I voli che cercherò saranno presi da momondo.it, di seguito digita nel seguente formato ciò che vedrai scritto"+"se il volo è di sola andata basta omettere città e la data di ritorno):\n\n"+"Città Andata-Città Ritorno"+"/"+
-				"Data partenza (yyyy-mm-dd)"+"/"+
-				"Data ritorno (yyyy-mm-dd)"+"/"+
-				"Numero adulti"+"/"+
-				"Numero studenti"+"/"+
-				"Numero bambini\n\n"+
-				"Inserisci le informazioni richieste.",
-		).WithReplyMarkup(tu.InlineKeyboard(
-			// Buttons below the message
-			tu.InlineKeyboardRow(tu.InlineKeyboardButton("Città ✈️").WithCallbackData("city"), tu.InlineKeyboardButton("Date 📅").WithCallbackData("dates")),
-			tu.InlineKeyboardRow(tu.InlineKeyboardButton("N° Passeggeri 👥").WithCallbackData("passengers")),
-		)),
-		)
+		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), ""))
 
 		if err != nil {
 			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
@@ -88,41 +75,6 @@ func main() {
 			os.Exit(1)
 		}
 
-	}, th.CommandEqual("voli"))
+	}, th.AnyCallbackQuery())
 
-	/* CallBack handler to InlineKeyboardButton city */
-
-	bh.HandleCallbackQuery(func(bot *telego.Bot, query telego.CallbackQuery) {
-		//
-		_, cerr := bot.SendMessage(tu.Message(tu.ID(query.Message.Chat.ID),
-			"",
-		))
-
-		bot.
-
-		if cerr != nil {
-			bot.SendMessage(tu.Message(tu.ID(query.Message.Chat.ID), "C'è stato un errore 😓"))
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}, th.AnyCallbackQueryWithMessage(), th.CallbackDataEqual("city"))
-
-	/*----------------------------------------------------------------------------------------*/
-
-	// Will match the command '/b_and_b'
-	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
-		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
-
-			"Prova B&B"),
-		)
-		if err != nil {
-			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-	}, th.CommandEqual("b_and_b"))
-
-	// Start handling updates
-	bh.Start()
 }
