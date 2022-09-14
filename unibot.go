@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	sc "github.com/B0r3ngIt5tuff/voyageBot/scraper"
+	sc "github.com/B0r3ngIt5tuff/UniBot/scraper"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"

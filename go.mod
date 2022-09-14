@@ -1,4 +1,4 @@
-module github.com/B0r3ngIt5tuff/voyageBot
+module github.com/B0r3ngIt5tuff/UniBot
 
 go 1.19
 
