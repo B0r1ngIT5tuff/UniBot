@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	sc "github.com/B0r3ngIt5tuff/voyageBot/scraper"
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -11,18 +12,17 @@ import (
 
 func main() {
 
-	API_TOKEN, ferr := os.ReadFile("token.txt")
-	//vsc := sc.UserRequest{}
-
+	API_TOKEN, ferr := os.ReadFile("Token.txt")
+	var telenews []sc.UserNews // User news
 	if ferr != nil {
-		fmt.Println(ferr)
+		fmt.Println("Something went wrong: " + ferr.Error())
 		os.Exit(1)
 	}
 
 	// Create the bot with the API token
 	bot, err := telego.NewBot(string(API_TOKEN))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Something went wrong: " + err.Error())
 		os.Exit(1)
 	}
 
@@ -41,7 +41,10 @@ func main() {
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
 
-			"Ciao !! Di seguito ci sono una serie di comandi utili:\n\n /help -> Visualizza questo messaggio\n /voli -> Trova voli economici inserendo le informazioni richieste\n /b_and_b -> Trova B&B economici inserendo le informazioni richieste"),
+			"Ciao !! Di seguito ci sono una serie di comandi utili:\n\n"+
+				" /help -> Visualizza questo messaggio\n"+
+				" /news -> Trova voli economici inserendo le informazioni richieste\n"+
+				" /set_news_refresh -> Imposta ogni quanto bisogna controllare per nuove notizie (TODO!)"),
 		)
 		if err != nil {
 			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
@@ -54,27 +57,40 @@ func main() {
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
 
-			"Ciao !! Di seguito ci sono una serie di comandi utili:\n\n /help -> Visualizza questo messaggio\n /voli -> Trova voli economici inserendo le informazioni richieste\n /b_and_b -> Trova B&B economici inserendo le informazioni richieste"),
+			"Ciao !! Di seguito ci sono una serie di comandi utili:\n\n"+
+				" /help -> Visualizza questo messaggio\n"+
+				" /news -> Trova voli economici inserendo le informazioni richieste\n"+
+				" /set_news_refresh -> Imposta ogni quanto bisogna controllare per nuove notizie (TODO!)"),
 		)
 		if err != nil {
-			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓 "))
-			fmt.Printf("Error: %v\n", err)
+			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
 			os.Exit(1)
 		}
 
 	}, th.CommandEqual("help"))
 
-	// Will match  the command '/voli'
+	// Will match  the command '/news'
 	bh.HandleMessage(func(bot *telego.Bot, message telego.Message) {
 
-		_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), ""))
+		telenews = sc.GetNews() // Fetches the news
 
-		if err != nil {
-			bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
-			fmt.Println(err)
-			os.Exit(1)
+		for _, v := range telenews {
+			// Send message to the user
+			_, err := bot.SendMessage(tu.Message(tu.ID(message.Chat.ID),
+				v.Title+"\n\n"+
+					"https://www.univaq.it/"+v.Text,
+			),
+			)
+
+			if err != nil {
+				bot.SendMessage(tu.Message(tu.ID(message.Chat.ID), "C'è stato un errore 😓"))
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		}
 
-	}, th.AnyCallbackQuery())
+	}, th.CommandEqual("news"))
+
+	bh.Start() // Starts listening
 
 }
