@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	sc "github.com/B0r3ngIt5tuff/voyageBot/scraper"
@@ -12,15 +13,31 @@ import (
 
 func main() {
 
-	API_TOKEN, ferr := os.ReadFile("Token.txt")
+	// Pass the token via args
+	args := os.Args
 	var telenews []sc.UserNews // User news
+	if args[1] == " " {
+		fmt.Printf("Please specify the path to the token!!\n" +
+			"Usage: ./voyageBot path/to/token\n",
+		)
+		os.Exit(1)
+	}
+
+	t_file, ferr := os.Open(args[1])  // It takes the token path with command-line args
+	TOKEN, rerr := io.ReadAll(t_file) // Reads the token
+
 	if ferr != nil {
-		fmt.Println("Something went wrong: " + ferr.Error())
+		fmt.Println("An error occurred while loading the token: " + ferr.Error())
+		os.Exit(1)
+	}
+
+	if rerr != nil {
+		fmt.Println("An error occurred while loading the token: " + rerr.Error())
 		os.Exit(1)
 	}
 
 	// Create the bot with the API token
-	bot, err := telego.NewBot(string(API_TOKEN))
+	bot, err := telego.NewBot(string(TOKEN))
 	if err != nil {
 		fmt.Println("Something went wrong: " + err.Error())
 		os.Exit(1)
